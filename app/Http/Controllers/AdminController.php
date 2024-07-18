@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\NewCompanyNotification;
 use App\Models\Companies;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class AdminController extends Controller
 {
@@ -46,9 +48,8 @@ class AdminController extends Controller
         $company_data->website = $request->input('website');
         if ($request->hasFile('logo')) {
             $company_data->logo = $this->uploadCompanyLogo($request->file('logo'));
-
         }
-
+        //Mail::to('dziubavlad7@gmail.com')->send(new NewCompanyNotification($company_data));
         $company_data->save();
         return redirect()->route('admin');
     }
