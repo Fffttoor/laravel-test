@@ -7,7 +7,16 @@
 <div class="row">
             <!-- Left col -->
             <div class="col-md-12">
-                <!-- TABLE: LATEST ORDERS -->
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+            @endif
+                <!-- TABLE -->
                 <div class="mb-5"><button type="button" class="btn btn-success" data-toggle="modal" data-target="#companyForm">{{__('Create new company')}}</button></div>
 
                 <div class="card">
@@ -36,26 +45,64 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td>
-                                        <button type="button"  class="btn btn-sm btn-outline-info">{{__('Edit')}}</button>
-                                        <button type="button"  class="btn btn-sm btn-outline-danger">{{__('Delete')}}</button>
-                                    </td>
-                                </tr>
+
+                                    <?php foreach ($companies as $company){ ?>
+                                    <tr>
+                                        <td>
+                                            <?php if(!empty($company['logo'])){ ?>
+                                            <img class="img-size-50 mr-3 img-circle img-fluid"
+                                                 style="height: 50px"
+                                                 src="{{'companies_logo/'.$company['logo']}}"
+                                                 alt="{{__('company logo')}}">
+                                            <?php }else { ?>
+                                                <p>{{__('No logo')}}</p>
+                                                <?php } ?>
+                                        </td>
+                                        <td>{{$company['name']}}</td>
+                                        <td>{{$company['email']}}</td>
+                                        <td>{{$company['website']}}</td>
+                                        <td>
+                                            <button type="button"  class="btn btn-sm btn-outline-info js-edit-company" data-id="{{$company['id']}}">{{__('Edit')}}</button>
+                                            <form action="{{ route('companies.destroy', $company['id']) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Ви впевнені, що хочете видалити цю компанію?')">
+                                                    {{ __('Delete') }}
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <?php } ?>
+
+
                                 </tbody>
                             </table>
                         </div>
                         <!-- /.table-responsive -->
+                    </div>
+                    <div class="card-footer clearfix">
+                        <div class="pagination my-4">
+                            {{ $companies->links() }}
+                        </div>
                     </div>
                 </div>
                 <!-- /.card -->
             </div>
             <!-- /.col -->
         </div>
+<div class="modal" id="companyFormEdit">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">{{__('Company Form')}}</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+
+            </div>
+        </div>
+    </div>
+</div>
 <div class="modal" id="companyForm">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -64,18 +111,18 @@
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             <div class="modal-body">
-                <form method="post" action="" class="mb-3">
+                <form method="post" action="{{route('companies.store')}}" class="mb-3" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="name">{{__('Name')}}</label>
                         <input type="text" class="form-control" id="name" name="name" required>
                     </div>
                     <div class="form-group">
                         <label for="email">{{__('Email')}}</label>
-                        <input type="email" class="form-control" id="email"  name="email" required>
+                        <input type="email" class="form-control" id="email" name="email" required>
                     </div>
                     <div class="form-group">
-                        <label for="email">{{__('Website')}}</label>
-                        <input type="text" class="form-control" id="website"  name="website">
+                        <label for="website">{{__('Website')}}</label>
+                        <input type="text" class="form-control" id="website" name="website">
                     </div>
                     <div class="form-group">
                         <label for="logo">{{__('Upload logotype')}}</label>
@@ -83,9 +130,8 @@
                     </div>
                     @csrf
                     <div class="d-flex justify-content-center align-items-center">
-                        <button type="submit" class="btn btn-success mr-1 w-100" data-dismiss="modal">{{__('Save')}}</button>
+                        <button type="submit" class="btn btn-success mr-1 w-100">{{__('Save')}}</button>
                         <button type="button" class="btn btn-light w-100" data-dismiss="modal">{{__('Close')}}</button>
-                        <button type="button" class="btn btn-danger  w-100 d-none" data-dismiss="modal">{{__('Delete')}}</button>
                     </div>
                 </form>
             </div>
